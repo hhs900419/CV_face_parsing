@@ -101,7 +101,7 @@ def test_fn():
         test_dataset.append([img_path, label_path])
 
     # inference
-    for i in tqdm(range(len(test_indices))):
+    for i in tqdm(range(len(test_indices), 100)):
         idx = test_indices[i]
         img_pth, mask_pth = test_dataset[idx]
         # print(idx)
