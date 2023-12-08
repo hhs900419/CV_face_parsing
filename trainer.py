@@ -175,7 +175,7 @@ class Trainer:
         ax[1].plot(range(self.epochs), metrics['valid_dice'], label='Valid')
         ax[1].legend()
         plt.show()
-        fig.savefig(str(self.savepath / 'metrics.jpg'))
+        fig.savefig(os.path.join(self.savepath , 'metrics.jpg'))
         plt.close()
 
     

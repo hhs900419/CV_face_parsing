@@ -28,7 +28,7 @@ def test_fn():
 
     ### Train/Val/Test Split ###
     ROOT_DIR = configs.root_dir
-    image_dir = os.path.join(root_dir, 'CelebA-HQ-img')
+    image_dir = os.path.join(ROOT_DIR, 'CelebA-HQ-img')
 
     train_indices = set()
     indices_file_pth = os.path.join(ROOT_DIR, 'train.txt')
@@ -51,7 +51,7 @@ def test_fn():
     BATCH_SIZE = configs.batch_size
     N_WORKERS = configs.n_workers
 
-    testset = CelebAMask_HQ_Dataset(root_dir=root_dir,
+    testset = CelebAMask_HQ_Dataset(root_dir=ROOT_DIR,
                                 sample_indices=test_indices,
                                 mode='test')
 
@@ -101,7 +101,7 @@ def test_fn():
         test_dataset.append([img_path, label_path])
 
     # inference
-    for i in tqdm(range(len(test_indices), 100)):
+    for i in tqdm(range(0, len(test_indices), 100)):
         idx = test_indices[i]
         img_pth, mask_pth = test_dataset[idx]
         # print(idx)

@@ -40,7 +40,7 @@ def train():
     test_indices = [idx for idx in sample_indices if idx not in train_indices]
     # Split indices into training and validation sets
     train_indices = list(train_indices)
-    # train_indices = train_indices[:100]         ############################################################################################################
+    # train_indices = train_indices[:100]         ###############################   small training data for debugging   ###########################################
     VAL_SIZE = configs.val_size
     train_indices, valid_indices = train_test_split(train_indices, test_size=VAL_SIZE, random_state=SEED)
     print(len(train_indices))
@@ -105,7 +105,7 @@ def train():
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=5)  # goal: maximize Dice score
     criterion = DiceLoss()
     # criterion = dice_loss
-    SAVEPATH = configs.savedir
+    SAVEPATH = configs.model_path
     SAVENAME = f'model_aug_{EPOCHS}eps.pth'
     
     ### training ###
