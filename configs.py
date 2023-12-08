@@ -6,8 +6,8 @@ class Configs():
         # self.root_dir = "/home/hsu/HD/dataset/CelebAMask-HQ"
         self.root_dir = "/home/hsu/HD/CV/CelebAMask-HQ"
         self.val_size = 0.15
-        self.batch_size = 10
-        self.n_workers = 8
+        self.batch_size = 8
+        self.n_workers = 6
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.epochs = 100
         self.lr = 5e-4

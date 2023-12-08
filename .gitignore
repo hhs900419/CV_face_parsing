@@ -1,3 +1,4 @@
 *.pyc
 *.pth
 result/*
+__pycache__/*

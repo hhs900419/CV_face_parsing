@@ -10,10 +10,10 @@ from configs import *
 
 
 def preprocess():
-
-    face_data = '/home/hsu/HD/CV/CelebAMask-HQ/CelebA-HQ-img'
-    face_sep_mask = '/home/hsu/HD/CV/CelebAMask-HQ/CelebAMask-HQ-mask-anno'
-    mask_path = '/home/hsu/HD/CV/CelebAMask-HQ/mask'
+    configs = Configs()
+    face_data = os.path.join(configs.root_dir, 'CelebA-HQ-img')
+    face_sep_mask = os.path.join(configs.root_dir, 'CelebAMask-HQ-mask-anno')
+    mask_path = os.path.join(configs.root_dir, 'mask')
 
     if not os.path.exists(mask_path):
         os.makedirs(mask_path)
