@@ -1,2 +1,2 @@
-__pychache__/*
-model_weight/*
+*.pyc
+*.pth
