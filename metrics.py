@@ -51,7 +51,7 @@ class SegMetric(object):
                 "Mean Acc : \t": acc_cls,
                 "FreqW Acc : \t": fwavacc,
                 "Mean IoU : \t": mean_iu,
-                "Overall F1: \t": f1
+                "Overall F1: \t": f1,
             },
             cls_iu,
         )

@@ -40,7 +40,8 @@ def train():
     test_indices = [idx for idx in sample_indices if idx not in train_indices]
     # Split indices into training and validation sets
     train_indices = list(train_indices)
-    # train_indices = train_indices[:100]         ###############################   small training data for debugging   ###########################################
+    if configs.debug:
+        train_indices = train_indices[:100]         ###############################   small training data for debugging   ###########################################
     VAL_SIZE = configs.val_size
     train_indices, valid_indices = train_test_split(train_indices, test_size=VAL_SIZE, random_state=SEED)
     print(len(train_indices))
@@ -102,11 +103,11 @@ def train():
     EPOCHS = configs.epochs
     LR = configs.lr
     optimizer = torch.optim.Adam(model.parameters(), lr=LR, betas=(0.9, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=False)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=5)  # goal: maximize Dice score
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=5, min_lr=1e-6, verbose=True)  # goal: minimize loss
     criterion = DiceLoss()
     # criterion = dice_loss
     SAVEPATH = configs.model_path
-    SAVENAME = f'model_aug_{EPOCHS}eps.pth'
+    SAVENAME = configs.model_weight
     
     ### training ###
     Trainer( model=model, 

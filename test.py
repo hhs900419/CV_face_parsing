@@ -39,7 +39,8 @@ def test_fn():
     test_indices = [idx for idx in sample_indices if idx not in train_indices]
     # Split indices into training and validation sets
     train_indices = list(train_indices)
-    # train_indices = train_indices[:100]         ############################################################################################################
+    if configs.debug:
+        train_indices = train_indices[:100]         ############################################################################################################
     VAL_SIZE = configs.val_size
     train_indices, valid_indices = train_test_split(train_indices, test_size=VAL_SIZE, random_state=SEED)
     print(len(train_indices))
@@ -62,15 +63,36 @@ def test_fn():
                         pin_memory = True,
                         drop_last = True)
     
+    ####################### for Debugging
+    if configs.debug:
+        validset = CelebAMask_HQ_Dataset(root_dir=ROOT_DIR, 
+                                        sample_indices=valid_indices, 
+                                        mode = 'val')
+        valid_loader = DataLoader(validset,
+                            batch_size = BATCH_SIZE,
+                            shuffle = False,
+                            num_workers = N_WORKERS, 
+                            pin_memory = True,
+                            drop_last = True)
+    #################################
+    
 
     ### load model ###
     DEVICE = configs.device
     SAVEPATH = configs.model_path
     OUTPUT_DIR = configs.cmp_result_dir
+    MODEL_WEIGHT = configs.model_weight
+    if configs.debug:
+        MODEL_WEIGHT = 'model_debug.pth'
 
     criterion = DiceLoss()
+    # criterion = cross_entropy2d()
     model = Unet(n_channels=3, n_classes=19).to(DEVICE)
-    model.load_state_dict(torch.load(os.path.join(SAVEPATH , 'model.pth')))
+    # model.load_state_dict(torch.load(os.path.join(SAVEPATH , 'model.pth')))
+    model.load_state_dict(torch.load(os.path.join(SAVEPATH , MODEL_WEIGHT)))
+    
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
 
     ### testing
     Tester(model=model, 
@@ -101,9 +123,13 @@ def test_fn():
         test_dataset.append([img_path, label_path])
 
     # inference
-    for i in tqdm(range(0, len(test_indices), 100)):
+    # for i in tqdm(range(0, len(test_indices), 100)):
+    for i in tqdm(range(0, len(train_indices))):
         idx = test_indices[i]
-        img_pth, mask_pth = test_dataset[idx]
+        if configs.debug:
+            # idx = valid_indices[i]
+            idx = train_indices[i]
+            img_pth, mask_pth = test_dataset[idx]
         # print(idx)
         # print(test_dataset[idx])
 
