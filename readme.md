@@ -24,3 +24,12 @@ python train.py
 ```Shell
 python test.py
 ```
+- 60 comparison results are generated for better visualization of the model performance
+
+### Notes
+- model weight is too large, can't push to gihub
+- [segmentation model pytorch](https://github.com/qubvel/segmentation_models.pytorch/tree/master) library might be useful for building different model architecture and applying pretrained weight.
+- [this reference] given by TAs shows lots of performance results by using different model architecture
+- [this library](https://github.com/open-mmlab/mmsegmentation) includes more architectures, but seems quite difficilt to use
+- [10 samples from Unseen dataset](https://drive.google.com/drive/folders/1jbOs1aBDN3myl6WX47Qy8nUqp9svA8-j)
+- [FaceSynthetics](https://github.com/microsoft/FaceSynthetics) dataset (optional)
