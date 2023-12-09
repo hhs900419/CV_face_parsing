@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from torch import optim
 import gc
+from metrics import *
 
 class Tester:
     def __init__(self, model,testloader, criterion, device):
@@ -29,6 +30,7 @@ class Tester:
         self.model.eval()
         test_losses = []
         test_dice_scores = []
+        metrics = SegMetric(n_classes=19)
         cnt = 0
 
         with torch.no_grad():
@@ -42,10 +44,16 @@ class Tester:
                 size = labels.size()
                 h, w = size[1], size[2]
 
-                pred_mask = self.model(img)
-                loss = self.criterion(pred_mask, mask)
-                # loss = cross_entropy2d(pred_mask, mask.long(), reduction='mean')
+                outputs = self.model(img)
+                loss1 = self.criterion(outputs, mask)
+                loss2 = cross_entropy2d(outputs, mask.long(), reduction='mean')
+                loss = loss1 + loss2
                 test_losses.append(loss.cpu().detach().numpy())
+                
+                outputs = F.interpolate(outputs, (h, w), mode='bilinear', align_corners=True)
+                pred = outputs.data.max(1)[1].cpu().numpy()  # Matrix index
+                gt = mask.cpu().numpy()
+                metrics.update(gt, pred)
 
                 # print(f"pred: {pred_mask.shape}")
                 # pred_mask = F.interpolate(pred_mask, (h, w), mode='bilinear', align_corners=True)
@@ -63,9 +71,9 @@ class Tester:
                 # print(f'lb_oh_sc: {labels_real.shape}')
 
                 # print(np.unique(pred_mask.data.max(1)[0].cpu().numpy()))
-                pred_mask = pred_mask.data.max(1)[1].cpu().numpy()  # Matrix index
-                mask = mask.cpu().detach().numpy()
-                img = img.permute(0,2,3,1).cpu().detach().numpy()
+                # pred_mask = pred_mask.data.max(1)[1].cpu().numpy()  # Matrix index
+                # mask = mask.cpu().detach().numpy()
+                # img = img.permute(0,2,3,1).cpu().detach().numpy()
                 
                 # cmap = np.array([(0,  0,  0), (204, 0,  0), (76, 153, 0),
                 #          (204, 204, 0), (51, 51, 255), (204, 0, 204), (0, 255, 255),
@@ -110,13 +118,17 @@ class Tester:
 
             avg_test_loss = sum(test_losses) / len(test_losses)
             # avg_dice_score = sum(val_dice_scores) / len(val_dice_scores)
-            avg_dice_score = 0
-            return avg_test_loss, avg_dice_score
+            metric_scores = metrics.get_scores()[0]
+            return avg_test_loss, metric_scores
         
     def run(self):
         print(f'Evaluating ... ')
-        test_loss, test_dice = self.test_fn()
+        test_loss, metric_score = self.test_fn()
         print(f'test loss: {test_loss}')
+        print("----------------- Total Val Performance --------------------")
+        for k, v in metric_score.items():
+            print(k, v)
+        print("---------------------------------------------------")
 
 
 

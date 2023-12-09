@@ -9,7 +9,7 @@ class Configs():
         self.batch_size = 8
         self.n_workers = 6
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.epochs = 100
+        self.epochs = 20
         self.lr = 5e-4
         # self.model_path = './model_weight/'
         self.model_path = '../model_weight/'

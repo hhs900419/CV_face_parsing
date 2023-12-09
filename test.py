@@ -123,13 +123,13 @@ def test_fn():
         test_dataset.append([img_path, label_path])
 
     # inference
-    # for i in tqdm(range(0, len(test_indices), 100)):
-    for i in tqdm(range(0, len(train_indices))):
+    # for i in tqdm(range(0, len(train_indices))):
+    for i in tqdm(range(0, len(test_indices), 100)):
         idx = test_indices[i]
         if configs.debug:
-            # idx = valid_indices[i]
+            idx = valid_indices[i]
             idx = train_indices[i]
-            img_pth, mask_pth = test_dataset[idx]
+        img_pth, mask_pth = test_dataset[idx]
         # print(idx)
         # print(test_dataset[idx])
 
