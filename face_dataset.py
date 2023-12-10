@@ -31,21 +31,11 @@ class CelebAMask_HQ_Dataset(Dataset):
         self.image_dir = os.path.join(root_dir, 'CelebA-HQ-img')  # Path to image folder
         self.mask_dir = os.path.join(root_dir, 'mask')    # Path to mask folder
         self.sample_indices = sample_indices
-
-        # self.images = os.listdir(self.image_dir)
-        # self.masks = os.listdir(self.mask_dir)
         
         self.train_dataset = []
         self.test_dataset = []
         self.preprocess()
         
-        # if train_mode:
-        #     self.num_images = len(self.train_dataset)
-        # else:
-        #     self.num_images = len(self.test_dataset)
-        
-        
-
     def preprocess(self):
         for i in range(len([name for name in os.listdir(self.image_dir) if osp.isfile(osp.join(self.image_dir, name))])):
             img_path = osp.join(self.image_dir, str(i)+'.jpg')
@@ -72,18 +62,12 @@ class CelebAMask_HQ_Dataset(Dataset):
         # mask = Image.open(mask_pth).convert('P')
         mask = Image.open(mask_pth).convert('L')
         
-        # mask = Image.open(mask_pth).convert('L')
-
         # data augmentation
         if self.mode == 'train':
             image, mask = self.tr_transform(image, mask)
-            # mask = self.tr_transform(mask)
 
         image = self.to_tensor(image)
         mask = torch.from_numpy(np.array(mask)).long()
-        # mask = np.array(mask).astype(np.int64)[np.newaxis, :]
-        # mask = transforms.ToTensor()(mask)
-        
         
         return image, mask
 

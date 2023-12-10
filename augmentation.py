@@ -7,7 +7,9 @@ from PIL import Image, ImageOps
 import torch
 import torchvision.transforms.functional as tf
 
-
+"""
+Rewrite augmentation functions so that it can do augmentation on image and mask simultaneously
+"""
 class Compose(object):
     def __init__(self, augmentations):
         self.augmentations = augmentations

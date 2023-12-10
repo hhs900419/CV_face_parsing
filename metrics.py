@@ -1,6 +1,8 @@
 import numpy as np
 
-
+"""
+Copy paste from the EasyPortrait repo
+"""
 class SegMetric(object):
     def __init__(self, n_classes):
         self.n_classes = n_classes

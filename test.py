@@ -27,6 +27,9 @@ def test_fn():
     torch.cuda.manual_seed(SEED)
 
     ### Train/Val/Test Split ###
+    """
+    create train/val/test index list (only test is used in this script)
+    """
     ROOT_DIR = configs.root_dir
     image_dir = os.path.join(ROOT_DIR, 'CelebA-HQ-img')
 
@@ -86,7 +89,6 @@ def test_fn():
         MODEL_WEIGHT = 'model_debug.pth'
 
     criterion = DiceLoss()
-    # criterion = cross_entropy2d()
     model = Unet(n_channels=3, n_classes=19).to(DEVICE)
     # model.load_state_dict(torch.load(os.path.join(SAVEPATH , 'model.pth')))
     model.load_state_dict(torch.load(os.path.join(SAVEPATH , MODEL_WEIGHT)))
@@ -107,7 +109,7 @@ def test_fn():
                          (255, 255, 0), (0, 0, 153), (0, 0, 204), (255, 51, 153),
                          (0, 204, 204), (0, 51, 0), (255, 153, 51), (0, 204, 0)],
                         dtype=np.uint8)
-    cnt = 0
+    
     to_tensor = transforms.Compose([
                 transforms.ToTensor(),
                 # transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
@@ -122,7 +124,7 @@ def test_fn():
         label_path = osp.join(mask_dir, str(i)+'.png')
         test_dataset.append([img_path, label_path])
 
-    # inference
+    # inference again in file order
     # for i in tqdm(range(0, len(train_indices))):
     for i in tqdm(range(0, len(test_indices), 100)):
         idx = test_indices[i]
@@ -130,8 +132,6 @@ def test_fn():
             idx = valid_indices[i]
             idx = train_indices[i]
         img_pth, mask_pth = test_dataset[idx]
-        # print(idx)
-        # print(test_dataset[idx])
 
         image = Image.open(img_pth).convert('RGB')
         image = image.resize((512, 512), Image.BILINEAR)
@@ -146,25 +146,18 @@ def test_fn():
         image = image.squeeze(0).permute(1,2,0)     # (1,3,h,w) -> (h,w,3)
         pred_mask = pred_mask.squeeze(0)            # (1,h,w) -> (h,w)
 
+        # generate color mask image
         color_gt_mask = cmap[gt_mask]
         color_pr_mask = cmap[pred_mask]
         
         plt.figure(figsize=(13, 6))
-        image = Image.open(img_pth).convert('RGB')      # we want the image without normalization
+        image = Image.open(img_pth).convert('RGB')      # we want the image without normalization for plotting
         image = image.resize((512, 512), Image.BILINEAR)
         img_list = [image, color_pr_mask, color_gt_mask]
         for i in range(3):
             plt.subplot(1, 3, i+1)
             plt.imshow(img_list[i])
         plt.savefig(f"{OUTPUT_DIR}/result_{idx}.jpg")
-
-
-        # if cnt < 50:
-        #     for i in range(3):
-        #         plt.subplot(1, 3, i+1)
-        #         plt.imshow(img_list[i])
-        #     plt.show()
-        #     cnt += 1
 
 if __name__ == "__main__":
     test_fn()

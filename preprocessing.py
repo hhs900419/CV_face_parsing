@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from configs import *
 
+"""
+copy paste from face-parsing repo
+"""
 
 def preprocess():
     configs = Configs()

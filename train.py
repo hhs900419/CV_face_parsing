@@ -30,7 +30,7 @@ def train():
     ### Train/Val/Test Split ###
     ROOT_DIR = configs.root_dir
     image_dir = os.path.join(ROOT_DIR, 'CelebA-HQ-img')
-
+    
     train_indices = set()
     indices_file_pth = os.path.join(ROOT_DIR, 'train.txt')
     with open(indices_file_pth, 'r') as file:
@@ -38,6 +38,7 @@ def train():
         
     sample_indices = list(range(len(os.listdir(image_dir))))
     test_indices = [idx for idx in sample_indices if idx not in train_indices]
+    
     # Split indices into training and validation sets
     train_indices = list(train_indices)
     if configs.debug:
@@ -47,9 +48,8 @@ def train():
     print(len(train_indices))
     print(len(valid_indices))
     print(len(test_indices))
-    # print(test_indices)
     
-    # augmentation
+    # augmentations
     train_tranform = Compose({
         RandomCrop(448),
         RandomHorizontallyFlip(p=0.5),
@@ -78,7 +78,6 @@ def train():
     train_loader = DataLoader(trainset,
                         batch_size = BATCH_SIZE,
                         shuffle = True,
-                        # sampler = sampler,
                         num_workers = N_WORKERS,
                         pin_memory = True,
                         drop_last = True)
@@ -89,7 +88,7 @@ def train():
                         num_workers = N_WORKERS, 
                         pin_memory = True,
                         drop_last = True)
-    print(f"training data{len(train_indices)} and validation data{len(valid_indices)} loaded succesfully ...")
+    print(f"training data: {len(train_indices)} and validation data: {len(valid_indices)} loaded succesfully ...")
     
     gc.collect()
     torch.cuda.empty_cache()    
@@ -103,9 +102,8 @@ def train():
     EPOCHS = configs.epochs
     LR = configs.lr
     optimizer = torch.optim.Adam(model.parameters(), lr=LR, betas=(0.9, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=False)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=5, min_lr=1e-6, verbose=True)  # goal: minimize loss
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=5, min_lr=1e-6, verbose=True)  # goal: maximize miou
     criterion = DiceLoss()
-    # criterion = dice_loss
     SAVEPATH = configs.model_path
     SAVENAME = configs.model_weight
     
@@ -120,7 +118,6 @@ def train():
         device=DEVICE,
         savepath=SAVEPATH, 
         savename=SAVENAME).run()
-    
     
 if __name__ == "__main__":
     train()
