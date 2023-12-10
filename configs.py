@@ -1,7 +1,10 @@
 import torch
+import os
 
 class Configs():
     def __init__(self):
+        # os.environ['CUDA_VISIBLE_DEVICES']='1'
+        
         self.seed = 1187
         # self.root_dir = "/home/hsu/HD/dataset/CelebAMask-HQ"
         self.root_dir = "/home/hsu/HD/CV/CelebAMask-HQ"

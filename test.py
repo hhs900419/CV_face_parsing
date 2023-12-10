@@ -87,14 +87,14 @@ def test_fn():
     MODEL_WEIGHT = configs.model_weight
     if configs.debug:
         MODEL_WEIGHT = 'model_debug.pth'
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
 
     criterion = DiceLoss()
     model = Unet(n_channels=3, n_classes=19).to(DEVICE)
     # model.load_state_dict(torch.load(os.path.join(SAVEPATH , 'model.pth')))
     model.load_state_dict(torch.load(os.path.join(SAVEPATH , MODEL_WEIGHT)))
     
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
 
     ### testing
     Tester(model=model, 
