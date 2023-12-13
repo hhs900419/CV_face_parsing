@@ -4,7 +4,8 @@ import cv2
 import numpy as np
 from augmentation import *
 from face_dataset import *
-from unet import *
+from models.unet import *
+from models.attention_unet import *
 from criterion import *
 from tester import *
 from configs import *
