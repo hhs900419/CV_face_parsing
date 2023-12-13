@@ -8,6 +8,7 @@ from unet import *
 from criterion import *
 from tester import *
 from configs import *
+from utils import *
 from PIL import Image
 import matplotlib.pyplot as plt
 import torch
@@ -97,11 +98,17 @@ def test_fn():
     
 
     ### testing
-    Tester(model=model, 
-       testloader=test_loader, 
-       criterion=criterion, 
-       device=DEVICE).run()
+    # Tester(model=model, 
+    #    testloader=test_loader, 
+    #    criterion=criterion, 
+    #    device=DEVICE).run()
     
+    labels_celeb = ['background','skin','nose',
+        'eye_g','l_eye','r_eye','l_brow',
+        'r_brow','l_ear','r_ear','mouth',
+        'u_lip','l_lip','hair','hat',
+        'ear_r','neck_l','neck','cloth']
+
     ### visualize
     cmap = np.array([(0,  0,  0), (204, 0,  0), (76, 153, 0),
                          (204, 204, 0), (51, 51, 255), (204, 0, 204), (0, 255, 255),
@@ -126,7 +133,7 @@ def test_fn():
 
     # inference again in file order
     # for i in tqdm(range(0, len(train_indices))):
-    for i in tqdm(range(0, len(test_indices), 100)):
+    for i in tqdm(range(0, len(test_indices))):
         idx = test_indices[i]
         if configs.debug:
             idx = valid_indices[i]
@@ -141,23 +148,62 @@ def test_fn():
         gt_mask = torch.from_numpy(np.array(mask)).long()
 
         pred_mask = model(image.to(DEVICE))     # predict
-        pred_mask = pred_mask.data.max(1)[1].cpu().numpy()  # Matrix index  (1,19,h,w) => (1,1,h,w)
+        pred_mask = pred_mask.data.max(1)[1].cpu().numpy()  # Matrix index  (1,19,h,w) => (1,h,w)
         
         image = image.squeeze(0).permute(1,2,0)     # (1,3,h,w) -> (h,w,3)
         pred_mask = pred_mask.squeeze(0)            # (1,h,w) -> (h,w)
+
+
+        classes = ['background', 'skin', 'l_brow', 'r_brow', 'l_eye', 'r_eye', 'eye_g', 'l_ear', 'r_ear', 'ear_r',
+                'nose', 'mouth', 'u_lip', 'l_lip', 'neck', 'neck_l', 'cloth', 'hair', 'hat']
+        one_hot_mask = one_hot_encode(pred_mask, 19)
+        # print(one_hot_mask.shape)
+        # print(one_hot_mask)
+        
+        test_dir = "test_result"
+        TEST_ID_DIR = f'{test_dir}/Test-image-{idx}'
+        if not os.path.exists(TEST_ID_DIR):
+            os.makedirs(TEST_ID_DIR)
+
+        dict_path = {}    
+
+        for j in range(19):
+            if j == 0:
+                mask = one_hot_mask[j,:,:] * 0
+            else:
+                mask = one_hot_mask[j,:,:] * 255
+            cv2.imwrite(f"{TEST_ID_DIR}/{classes[j]}.png", mask)
+            dict_path[classes[j]] = f"{TEST_ID_DIR}/{classes[j]}.png"
+
 
         # generate color mask image
         color_gt_mask = cmap[gt_mask]
         color_pr_mask = cmap[pred_mask]
         
-        plt.figure(figsize=(13, 6))
-        image = Image.open(img_pth).convert('RGB')      # we want the image without normalization for plotting
-        image = image.resize((512, 512), Image.BILINEAR)
-        img_list = [image, color_pr_mask, color_gt_mask]
-        for i in range(3):
-            plt.subplot(1, 3, i+1)
-            plt.imshow(img_list[i])
-        plt.savefig(f"{OUTPUT_DIR}/result_{idx}.jpg")
+        # plt.figure(figsize=(13, 6))
+        # image = Image.open(img_pth).convert('RGB')      # we want the image without normalization for plotting
+        # image = image.resize((512, 512), Image.BILINEAR)
+        # img_list = [image, color_pr_mask, color_gt_mask]
+        # for i in range(3):
+        #     plt.subplot(1, 3, i+1)
+        #     plt.imshow(img_list[i])
+        # plt.savefig(f"{OUTPUT_DIR}/result_{idx}.jpg")
+
+        labels_celeb = ['background','skin','nose',
+        'eye_g','l_eye','r_eye','l_brow',
+        'r_brow','l_ear','r_ear','mouth',
+        'u_lip','l_lip','hair','hat',
+        'ear_r','neck_l','neck','cloth']
+
+        right_order_mask_path = {}
+
+        for lab in labels_celeb:
+            right_order_mask_path[lab] = dict_path[lab]
+
+
+        # print(i)
+        mask2csv(mask_paths=right_order_mask_path, image_id=i)
+        # break
 
 if __name__ == "__main__":
     test_fn()

@@ -12,11 +12,12 @@ class Configs():
         self.batch_size = 8
         self.n_workers = 6
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.epochs = 20
+        self.epochs = 50
         self.lr = 5e-4
         # self.model_path = './model_weight/'
         self.model_path = '../model_weight/'
-        self.model_weight = f'model_aug_miou_{self.epochs}eps.pth'
+        # self.model_weight = f'model_aug_miou_{self.epochs}eps.pth'
+        self.model_weight = "best_model_miou_50eps.pth"
         # self.model_weight = f'model_debug.pth'
         self.cmp_result_dir = './result'
         self.debug = False
